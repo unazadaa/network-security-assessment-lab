@@ -1,170 +1,104 @@
 Network Security Assessment Lab
-Overview
 
-This project simulates a basic internal network security assessment performed in a controlled lab environment using Kali Linux and Ubuntu Server.
+**Executive Summary**
+This project simulates an internal network security assessment conducted in a controlled lab environment.
+The goal was to identify exposed services, assess associated risks, simulate attack scenarios, apply mitigation strategies, and validate remediation effectiveness.
+The assessment successfully identified SSH password authentication as a potential attack vector and implemented hardening measures to reduce brute-force risk exposure.
 
-The objective was to practice reconnaissance, port scanning, service enumeration, risk analysis, and hardening techniques following a structured security assessment methodology.
+**Scope**
 
-Objective
-
-To identify exposed services within an internal network, analyze potential security risks, and implement mitigation strategies to reduce the attack surface.
-
-Lab Environment
-Role	System	IP Address
-Attacker	Kali Linux	192.168.56.X
-Target	Ubuntu Server	192.168.56.102
-
-Network Configuration:
-
-Host-Only Network (VirtualBox)
-
+Environment: VirtualBox (Host-Only Network)
+Attacker: Kali Linux
+Target: Ubuntu Server
 Subnet: 192.168.56.0/24
 
-Methodology
+This assessment was conducted in a non-production lab environment for educational purposes.
 
-The assessment followed five structured phases:
+**Methodology**
+The engagement followed a structured security workflow:
 
-**1: Lab Setup**
-VirtualBox environment configuration
+1 Network Discovery
+2 Port Scanning
+3 Service Enumeration
+4 Risk Analysis
+5 Exploit Simulation
+6 Hardening
+7Post-Mitigation Validation
 
-Host-only network setup
-
-Connectivity verification using ping
-
-**2: Network Discovery**
-Command used:
-
+**Phase 1 – Network Discovery**
+Command:
 nmap -sn 192.168.56.0/24
 
-
-Explanation:
-
--sn → Host discovery only (no port scan)
-
-Technique used → ARP requests within local network
-
+Technique Used:
+  ARP-based host discovery (Layer 2)
 Result:
-
-Multiple active hosts identified
-
-Target machine confirmed at 192.168.56.102
-
-**3: Port Scanning & Service Enumeration**
-
-Command used:
-
+  Active hosts identified
+  Target confirmed at 192.168.56.102
+  **Phase 2 – Port Scanning & Service Detection**
+Command:
 nmap -sS -sV -O 192.168.56.102
 
-
-Options explained:
-
--sS → SYN Scan (stealth scan)
-
--sV → Service version detection
-
--O → Operating system detection
-
 Findings:
-Port	State	Service	Version
-22/tcp	Open	SSH	OpenSSH 9.6p1 (Ubuntu)
+| Port   | Service | Version       | Risk             |
+| ------ | ------- | ------------- | ---------------- |
+| 22/tcp | SSH     | OpenSSH 9.6p1 | Brute-force risk |
 
-**4: Risk Analysis**
+**Identified Risk:**
+SSH service exposed with password authentication enabled.
 
-Identified risk:
+**Threat Scenario:**
+  Brute force attacks
+  Credential stuffing
+  Unauthorized remote access
 
-SSH exposed with password authentication enabled
+**Attack Simulation**
+**Tool used:**
+  Hydra
+  Attempted brute-force attack against SSH service.
 
-Potential Threat:
+**Result:**
+Password authentication initially allowed attack attempts.
 
-Brute force attack
+**Mitigation Implemented**
+Configuration change in:
+  /etc/ssh/sshd_config
 
-Credential stuffing
+**Modified parameter:**
+  PasswordAuthentication no
 
-Unauthorized remote access
+**Service restarted:**
+  sudo systemctl restart ssh
 
-Example attack attempt:
+**Validation**
+Post-mitigation testing confirmed:
+  Password authentication disabled
+  Brute-force attempts blocked
+  Reduced attack surface
 
-hydra -l user -P rockyou.txt ssh://192.168.56.102
-
-**5: Mitigation Implemented**
-
-Hardening applied on Ubuntu Server:
-
-sudo nano /etc/ssh/sshd_config
-
-
-Modified:
-
-PasswordAuthentication no
+**Security Impact**
+| Before                 | After                  |
+| ---------------------- | ---------------------- |
+| Password login enabled | Disabled               |
+| Brute-force possible   | Prevented              |
+| Higher exposure        | Reduced attack surface |
 
 
-Service restarted:
-
-sudo systemctl restart ssh
-
-**6: Validation of Mitigation**
-Re-scanned SSH authentication methods.
-
-**Results**
-Password authentication disabled
-
-Hydra brute-force attack no longer possible
-
-Attack surface successfully reduced.
-
-**Security Improvements Achieved**
-
-Eliminated password-based SSH authentication
-Enforced stronger authentication model
-Reduced brute-force exposure
-Validated mitigation effectiveness
-
-**Key Skills Demonstrated**
-Network reconnaissance
-
-Port scanning techniques
-
-Service enumeration
-
-Risk assessment mindset (SOC perspective)
-
-Linux hardening
-
-Attack simulation
-
-Security validation testing
-
-Documentation & reporting
-
-**Conclusion**
-
-This lab demonstrates a complete mini security assessment cycle:
-
-Discover
-
-Enumerate
-
-Analyze
-
-Exploit attempt
-
-Mitigate
-
-Validate
-
-The SSH service was identified as a potential attack vector and successfully hardened to reduce risk exposure within the internal network.
-
+**Skills Demonstrated**
+  Network reconnaissance
+  SYN scanning
+  Service enumeration
+  Risk identification
+  Attack simulation
+  Linux system hardening
+  Security validation
+  Security documentation
+  
 **Future Improvements**
-Implement Fail2Ban
-
-Configure firewall rules (UFW)
-
-Add web server attack surface
-
-Perform vulnerability scanning with NSE scripts
-
-Create SIEM-style logging analysis
+  Implement Fail2Ban
+  Configure UFW firewall rules
+  Add centralized logging
+  Deploy a vulnerable web service for extended testing
+  Simulate SIEM monitoring
 
 **Disclaimer**
-
-This lab was conducted in a controlled virtual environment for educational purposes only. No real systems were targeted.
+This project was conducted in a controlled lab environment for ethical and educational purposes only.
