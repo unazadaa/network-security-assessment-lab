@@ -1,82 +1,170 @@
 Network Security Assessment Lab
-1. Project Overview
+Overview
 
-This project simulates a small internal network to perform a basic security assessment using Nmap. The objective was to identify active hosts, detect open ports and running services, analyze potential security risks, and propose mitigation strategies aligned with SOC-level analysis.
+This project simulates a basic internal network security assessment performed in a controlled lab environment using Kali Linux and Ubuntu Server.
 
-2. Lab Environment
+The objective was to practice reconnaissance, port scanning, service enumeration, risk analysis, and hardening techniques following a structured security assessment methodology.
 
-Virtualization Platform: VirtualBox
-Attacker Machine: Kali Linux
-Target Machine: Ubuntu Server
-Network Configuration: Host-Only Network
+Objective
 
-Both machines were configured within the same isolated network segment to simulate an internal enterprise environment.
+To identify exposed services within an internal network, analyze potential security risks, and implement mitigation strategies to reduce the attack surface.
 
-3. Methodology
-Step 1 – Host Discovery
-nmap -sn 192.168.X.0/24
+Lab Environment
+Role	System	IP Address
+Attacker	Kali Linux	192.168.56.X
+Target	Ubuntu Server	192.168.56.102
+
+Network Configuration:
+
+Host-Only Network (VirtualBox)
+
+Subnet: 192.168.56.0/24
+
+Methodology
+
+The assessment followed five structured phases:
+
+**1: Lab Setup**
+VirtualBox environment configuration
+
+Host-only network setup
+
+Connectivity verification using ping
+
+**2: Network Discovery**
+Command used:
+
+nmap -sn 192.168.56.0/24
 
 
-Purpose: Identify active hosts within the subnet.
-Technique: ICMP echo requests and ARP discovery (ping scan).
+Explanation:
 
-Step 2 – Port Scanning & Service Detection
-nmap -sS -sV -O <TARGET_IP>
+-sn → Host discovery only (no port scan)
+
+Technique used → ARP requests within local network
+
+Result:
+
+Multiple active hosts identified
+
+Target machine confirmed at 192.168.56.102
+
+**3: Port Scanning & Service Enumeration**
+
+Command used:
+
+nmap -sS -sV -O 192.168.56.102
 
 
--sS → TCP SYN Scan (stealth scan)
+Options explained:
+
+-sS → SYN Scan (stealth scan)
 
 -sV → Service version detection
 
 -O → Operating system detection
 
-4. Findings
-
-Example (replace with your real results):
-
+Findings:
 Port	State	Service	Version
-22	Open	SSH	OpenSSH 8.x
-80	Open	HTTP	Apache 2.x
+22/tcp	Open	SSH	OpenSSH 9.6p1 (Ubuntu)
 
-The scan identified exposed services running on the target system.
+**4: Risk Analysis**
 
-5. Risk Analysis
-Port 22 – SSH
+Identified risk:
 
-Risk: Potential brute-force attacks or credential compromise.
-Impact: Unauthorized remote access.
-Recommendation:
+SSH exposed with password authentication enabled
 
-Disable root login
+Potential Threat:
 
-Implement key-based authentication
+Brute force attack
 
-Configure fail2ban
+Credential stuffing
 
-Restrict access via firewall
+Unauthorized remote access
 
-Port 80 – HTTP
+Example attack attempt:
 
-Risk: Exposure to web-based vulnerabilities.
-Impact: Possible information disclosure or exploitation.
-Recommendation:
+hydra -l user -P rockyou.txt ssh://192.168.56.102
 
-Apply server hardening
+**5: Mitigation Implemented**
 
-Keep services updated
+Hardening applied on Ubuntu Server:
 
-Restrict unnecessary exposure
+sudo nano /etc/ssh/sshd_config
 
-6. Conclusion
 
-This lab demonstrates foundational skills in network enumeration, service detection, and security risk analysis. The exercise reflects practical SOC-level tasks such as identifying exposed services, analyzing potential threats, and recommending mitigation strategies.
+Modified:
 
-7. Tools Used
+PasswordAuthentication no
 
-Nmap
 
-VirtualBox
+Service restarted:
 
-Kali Linux
+sudo systemctl restart ssh
 
-Ubuntu Server
+**6: Validation of Mitigation**
+Re-scanned SSH authentication methods.
+
+**Results**
+Password authentication disabled
+
+Hydra brute-force attack no longer possible
+
+Attack surface successfully reduced.
+
+**Security Improvements Achieved**
+
+Eliminated password-based SSH authentication
+Enforced stronger authentication model
+Reduced brute-force exposure
+Validated mitigation effectiveness
+
+**Key Skills Demonstrated**
+Network reconnaissance
+
+Port scanning techniques
+
+Service enumeration
+
+Risk assessment mindset (SOC perspective)
+
+Linux hardening
+
+Attack simulation
+
+Security validation testing
+
+Documentation & reporting
+
+**Conclusion**
+
+This lab demonstrates a complete mini security assessment cycle:
+
+Discover
+
+Enumerate
+
+Analyze
+
+Exploit attempt
+
+Mitigate
+
+Validate
+
+The SSH service was identified as a potential attack vector and successfully hardened to reduce risk exposure within the internal network.
+
+**Future Improvements**
+Implement Fail2Ban
+
+Configure firewall rules (UFW)
+
+Add web server attack surface
+
+Perform vulnerability scanning with NSE scripts
+
+Create SIEM-style logging analysis
+
+**Disclaimer**
+
+This lab was conducted in a controlled virtual environment for educational purposes only. No real systems were targeted.
